@@ -22,15 +22,7 @@ function xhprof_admin_settings() {
     '#title' => t('Disable profiling of admin pages'),
     '#default_value' => variable_get('xhprof_disable_admin_paths', TRUE),
   );
-  $form['settings'] = array(
-    '#type' => 'container',
-    '#states' => array(
-      'invisible' => array(
-        'input[name="xhprof_enabled"]' => array('checked' => FALSE),
-      ),
-    ),
-  );  
-  $form['settings']['xhprof_interval'] = array(
+  $form['xhprof_interval'] = array(
     '#type' => 'textfield',
     '#title' => 'Profiling interval',
     '#default_value' => variable_get('xhprof_interval', ''),
@@ -49,6 +41,9 @@ function xhprof_admin_settings() {
   return system_settings_form($form);
 }
 
+/**
+ * Validation handler for settings form.
+ */
 function xhprof_admin_settings_validate($form, &$form_state) {
   // TODO: Simplify this.
   if (isset($form_state['values']['xhprof_interval']) && $form_state['values']['xhprof_interval'] != '' && (!is_numeric($form_state['values']['xhprof_interval']) || $form_state['values']['xhprof_interval'] <= 0 || $form_state['values']['xhprof_interval'] > mt_getrandmax())) {

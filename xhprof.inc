@@ -641,8 +641,7 @@ function xhprof_profiler_report($url_params, $rep_symbol, $sort, $run1, $run1_de
   // set up the action links for operations that can be done on this report
   $links = array();
   $path_parts = explode('/', $_GET['q']);
-  array_pop($path_parts);
-  $links[] = l("View Top Level $diff_text Report", implode('/', $path_parts));
+  $links[] = l("View Top Level $diff_text Report", implode('/', array_slice($path_parts, 0, 4)));
 
   if ($diff_mode) {
     $inverted_params = $url_params;
@@ -822,7 +821,7 @@ function xhprof_print_flat_data($url_params, $title, $flat_data, $sort, $run1, $
     if (array_key_exists($stat, xhprof_sortable_columns($stat))) {
       if (isset($_GET['sort']) && $stat == $_GET['sort']) {
         $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
-        $header[] = array('data' => t($header_desc) . theme('tablesort_indicator', array('style' => 'desc')));
+        $header[] = array('data' => t($header_desc) . theme('tablesort_indicator', 'desc'));
       }
       else {
         $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
@@ -874,7 +873,7 @@ function xhprof_print_flat_data($url_params, $title, $flat_data, $sort, $run1, $
   }
 
   $output .= "<h3 align=center>$title $display_link</h3><br>";
-  $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
+  $output .= theme('table', $header, $rows, $attributes);
   return $output;
 }
 
@@ -939,18 +938,12 @@ function xhprof_full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
       );
       $rows[] = $row;
     }
-    $output .= theme('table', array('header' => $headers, 'rows' => $rows));
+    $output .= theme('table', $headers, $rows);
 
     $callgraph_report_title = '[View Regressions/Improvements using Callgraph Diff]';
   }
   else {
-    $vars = array(
-      'totals' => $totals,
-      'possible_metrics' => $possible_metrics,
-      'metrics' => $metrics,
-      'display_calls' => $display_calls,
-    );
-    $output .= theme('xhprof_overall_summary', $vars);
+    $output .= theme('xhprof_overall_summary', $totals, $possible_metrics, $metrics, $display_calls);
   }
 
   $output .= "<center><br><h3>";
@@ -995,18 +988,8 @@ function xhprof_full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
       $title = "Displaying top $limit functions: Sorted by $desc";
     }
   }
-  $vars = array(
-    'stats' => $stats,
-    'totals' => $totals,
-    'url_params' => $url_params,
-    'title' => $title,
-    'flat_data' => $flat_data,
-    'limit' => $limit,
-    'run1' => $run1,
-    'run2' => $run2,
-  );
 
-  $output .= theme('xhprof_run_table', $vars);
+  $output .= theme('xhprof_run_table', $stats, $totals, $url_params, $title, $flat_data, $limit, $run1, $run2);
   return $output;
 }
 
@@ -1208,7 +1191,7 @@ function xhprof_symbol_report($url_params, $run_data, $symbol_info, $sort, $rep_
     if (array_key_exists($stat, xhprof_sortable_columns($stat))) {
       if ($stat == $sort) {
         $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
-        $headers[] = array('data' => t($header_desc) . theme('tablesort_indicator', array('style' => 'desc')));
+        $headers[] = array('data' => t($header_desc) . theme('tablesort_indicator', 'desc'));
       }
       else {
         $header_desc = l(t($desc), $_GET['q'], array('query' => array('sort' => $stat), t($desc)));
@@ -1297,7 +1280,7 @@ function xhprof_symbol_report($url_params, $run_data, $symbol_info, $sort, $rep_
     $rows = array_merge($rows, $pc_row);
   }
 
-  $output .= theme('table', array('header' => $headers, 'rows' => $rows));
+  $output .= theme('table', $headers, $rows);
 
   // TODO: Convert tooltips.
   // These will be used for pop-up tips/help.

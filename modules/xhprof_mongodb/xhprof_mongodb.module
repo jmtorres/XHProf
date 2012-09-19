@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__) . '/MongodbXHProfRuns.inc');
 /**
  * Implementation of hook_xhprof_classes_alter().
  */
