@@ -19,6 +19,12 @@ function xhprof_menu() {
     'page arguments' => array(3),
     'access arguments' => array('access xhprof data'),
   );
+  $items[XHPROF_PATH . '/%/callgraph'] = array(
+    'title' => 'XHProf callgraph',
+    'page callback' => 'xhprof_display_callgraph',
+    'page arguments' => array(3),
+    'access arguments' => array('access xhprof data'),
+  );
   $items[XHPROF_PATH . '/diff/%/%'] = array(
     'title' => 'XHProf view',
     'page callback' => 'xhprof_display_diff_page',
@@ -379,6 +385,30 @@ function xhprof_display_run($run_ids, $symbol = NULL) {
   }
 
   return $output;
+}
+
+/**
+ * Display a call graph for the specified run
+ * @param type $id
+ * @param type $source
+ */
+function xhprof_display_callgraph($id, $depth = 0.1, $function = '') {
+  // The source is always the sitename
+  $source = variable_get('site_name', '');
+
+  // by default assume that xhprof_html & xhprof_lib directories
+  // are at the same level.
+  $GLOBALS['XHPROF_LIB_ROOT'] = dirname(__FILE__) . '/xhprof_lib';
+
+  include_once $GLOBALS['XHPROF_LIB_ROOT'].'/utils/xhprof_lib.php';
+  include_once $GLOBALS['XHPROF_LIB_ROOT'].'/utils/callgraph_utils.php';
+  include_once $GLOBALS['XHPROF_LIB_ROOT'].'/utils/xhprof_runs.php';
+
+  ini_set('max_execution_time', 100);
+
+  $xhprof_runs_impl = new XHProfRuns_Default();
+
+  xhprof_render_image($xhprof_runs_impl, $id, 'jpg', $depth, $function, $source, FALSE);
 }
 
 function xhprof_scandir($dir, $source) {

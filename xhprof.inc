@@ -643,6 +643,7 @@ function xhprof_profiler_report($url_params, $rep_symbol, $sort, $run1, $run1_de
   $path_parts = explode('/', current_path());
   array_pop($path_parts);
   $links[] = l("View Top Level $diff_text Report", implode('/', $path_parts));
+  $links[] = l(t('Call graph'), 'admin/reports/xhprof/' . $base_url_params['run'] . '/callgraph');
 
   if ($diff_mode) {
     $inverted_params = $url_params;
